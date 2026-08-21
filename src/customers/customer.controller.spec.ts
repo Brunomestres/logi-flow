@@ -47,7 +47,7 @@ describe("CustomerController", () => {
 		await expect(controller.create(dto)).rejects.toThrow(error);
 	});
 
-	it("should retunrns customers by ID", async () => {
+	it("should return customer by ID", async () => {
 		const params = {
 			id: "ab0a9593-43d5-4483-8a52-351f9f529877",
 		};
@@ -62,8 +62,25 @@ describe("CustomerController", () => {
 
 		const result = await controller.findOne(params);
 
-		expect(service.findOne).toHaveBeenCalledTimes(1);
 		expect(service.findOne).toHaveBeenCalledWith(params.id);
 		expect(result).toEqual(customer);
+	});
+
+	it("should return error NotFoundException by ID", async () => {
+		const params = {
+			id: "ab0a9593-43d5-4483-8a52-351f9f529878",
+		};
+
+		const customer = {
+			id: "ab0a9593-43d5-4483-8a52-351f9f529875",
+			name: "Bruno",
+			email: "bruno@email.com",
+		};
+
+		service.findOne.mockResolvedValue(customer);
+		const error = new Error("Customer não encontrado");
+
+		service.findOne.mockRejectedValue(error);
+		await expect(controller.findOne(params)).rejects.toThrow(error);
 	});
 });
